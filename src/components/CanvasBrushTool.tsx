@@ -91,17 +91,27 @@ const CanvasBrushTool: React.FC = observer(() => {
 
   return (
     <div
-      ref={containerRef}
-      onMouseDown={handleMouseDown}
       style={{
-        position: "relative",
-        width: 800,
-        height: 600,
-        border: "2px solid #ccc",
-        backgroundColor: "#fff",
-        userSelect: "none",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "100vw",
       }}
-    />
+    >
+      <div
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        style={{
+          position: "relative",
+          width: 800,
+          height: 600,
+          border: "2px solid #ccc",
+          backgroundColor: "#fff",
+          userSelect: "none",
+        }}
+      />
+    </div>
   );
 });
 
