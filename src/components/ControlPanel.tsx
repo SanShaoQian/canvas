@@ -5,6 +5,16 @@ import toolStore from "../store/ToolStore";
 const ControlPanel: React.FC = observer(() => {
   const tools = ["brush", "fill", "shape"] as const;
 
+  const handleDeleteLast = () => {
+    if (toolStore.layers.length > 0) {
+      toolStore.removeLayer(toolStore.layers.length - 1);
+    }
+  };
+
+  const handleClearAll = () => {
+    toolStore.clearLayers();
+  };
+
   return (
     <div
       style={{
@@ -15,7 +25,6 @@ const ControlPanel: React.FC = observer(() => {
         marginBottom: "1rem",
       }}
     >
-      
       <div style={{ display: "flex", gap: "0.5rem" }}>
         {tools.map((tool) => (
           <button
@@ -56,6 +65,36 @@ const ControlPanel: React.FC = observer(() => {
             </select>
           </label>
         )}
+      </div>
+
+      <div style={{ display: "flex", gap: "1rem" }}>
+        <button
+          onClick={handleDeleteLast}
+          disabled={toolStore.layers.length === 0}
+          style={{
+            padding: "0.5rem 1rem",
+            border: "1px solid #aaa",
+            backgroundColor: "#ffecec",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Delete Last Layer
+        </button>
+
+        <button
+          onClick={handleClearAll}
+          disabled={toolStore.layers.length === 0}
+          style={{
+            padding: "0.5rem 1rem",
+            border: "1px solid #aaa",
+            backgroundColor: "#ffeecc",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Clear All Layers
+        </button>
       </div>
     </div>
   );

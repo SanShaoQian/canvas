@@ -1,18 +1,26 @@
-import { makeAutoObservable } from "mobx";
-
-export type Tool = "brush" | "fill" | "shape";
-export type Shape = "rectangle" | "circle";
+import { makeObservable, observable, action } from "mobx";
 
 class ToolStore {
-  selectedTool: Tool = "brush";
+  selectedTool: "brush" | "fill" | "shape" = "brush";
   selectedColor: string = "#000000";
-  shape: Shape = "circle";
+  shape: "circle" | "rectangle" = "circle";
+  layers: HTMLCanvasElement[] = [];
 
   constructor() {
-    makeAutoObservable(this);
+    makeObservable(this, {
+      selectedTool: observable,
+      selectedColor: observable,
+      shape: observable,
+      layers: observable,
+      setTool: action,
+      setColor: action,
+      setShape: action,
+      addLayer: action,
+      removeLayer:action
+    });
   }
 
-  setTool(tool: Tool) {
+  setTool(tool: "brush" | "fill" | "shape") {
     this.selectedTool = tool;
   }
 
@@ -20,11 +28,31 @@ class ToolStore {
     this.selectedColor = color;
   }
 
-  setShape(shape: Shape) {
+  setShape(shape: "circle" | "rectangle") {
     this.shape = shape;
+  }
+
+  addLayer(canvas: HTMLCanvasElement) {
+    this.layers.push(canvas);
+  }
+
+  removeLayer(index: number) {
+    const layer = this.layers[index];
+    if (layer && layer.parentElement) {
+      layer.parentElement.removeChild(layer);
+    }
+    this.layers.splice(index, 1);
+  }
+
+  clearLayers() {
+    this.layers.forEach(layer => {
+      if (layer.parentElement) {
+        layer.parentElement.removeChild(layer);
+      }
+    });
+    this.layers = [];
   }
 }
 
 const toolStore = new ToolStore();
-
 export default toolStore;
