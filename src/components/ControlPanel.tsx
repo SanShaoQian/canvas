@@ -58,10 +58,11 @@ const ControlPanel: React.FC = observer(() => {
             Shape:{" "}
             <select
               value={toolStore.shape}
-              onChange={(e) => toolStore.setShape(e.target.value as "circle" | "rectangle")}
+              onChange={(e) => toolStore.setShape(e.target.value as "circle" | "rectangle" | "triangle")}
             >
               <option value="circle">Circle</option>
               <option value="rectangle">Rectangle</option>
+              <option value="triangle">Triangle</option>
             </select>
           </label>
         )}

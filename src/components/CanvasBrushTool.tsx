@@ -1,53 +1,47 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import toolStore from "../store/ToolStore";
 
 const CanvasBrushTool: React.FC = observer(() => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.lineWidth = 5;
-      }
-    }
-  }, []);
-
-  const getContext = (): CanvasRenderingContext2D | null => {
-    return canvasRef.current?.getContext("2d") ?? null;
+  const createLayer = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.style.position = "absolute";
+    canvas.style.top = "0";
+    canvas.style.left = "0";
+    canvas.style.pointerEvents = "none"; // avoid blocking mouse events
+    canvas.style.zIndex = (toolStore.layers.length + 1).toString();
+    toolStore.addLayer(canvas);
+    containerRef.current?.appendChild(canvas);
+    return canvas;
   };
 
-  const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current!;
-    const rect = canvas.getBoundingClientRect();
+  const getMousePos = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = containerRef.current!.getBoundingClientRect();
     return {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const ctx = getContext();
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const canvas = createLayer();
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const { x, y } = getMousePos(e);
-
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 5;
     ctx.strokeStyle = toolStore.selectedColor;
     ctx.fillStyle = toolStore.selectedColor;
 
-    if (toolStore.selectedTool === "fill") {
-      ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-    }
+    const { x, y } = getMousePos(e);
 
-    if (toolStore.selectedTool === "brush") {
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      setIsDrawing(true);
+    if (toolStore.selectedTool === "fill") {
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     if (toolStore.selectedTool === "shape") {
@@ -57,42 +51,56 @@ const CanvasBrushTool: React.FC = observer(() => {
         ctx.fill();
       } else if (toolStore.shape === "rectangle") {
         ctx.fillRect(x - 30, y - 20, 60, 40);
+      } else if (toolStore.shape === "triangle") {
+        ctx.beginPath();
+        ctx.moveTo(x, y - 20);
+        ctx.lineTo(x - 20, y + 20);
+        ctx.lineTo(x + 20, y + 20);
+        ctx.closePath();
+        ctx.fill();
       }
     }
-  };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || toolStore.selectedTool !== "brush") return;
+    if (toolStore.selectedTool === "brush") {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
 
-    const ctx = getContext();
-    if (!ctx) return;
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const { left, top } = canvas.getBoundingClientRect();
+        const mx = moveEvent.clientX - left;
+        const my = moveEvent.clientY - top;
+        ctx.lineTo(mx, my);
+        ctx.stroke();
+      };
 
-    const { x, y } = getMousePos(e);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  };
+      const handleMouseUp = () => {
+        ctx.closePath();
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+      };
 
-  const handleMouseUp = () => {
-    if (!isDrawing) return;
-
-    const ctx = getContext();
-    if (toolStore.selectedTool === "brush" && ctx) {
-      ctx.closePath();
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
     }
-
-    setIsDrawing(false);
   };
+
+  useEffect(() => {
+    containerRef.current!.innerHTML = "";
+    toolStore.clearLayers();
+  }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={800}
-      height={600}
-      style={{ border: "2px solid #ccc", backgroundColor: "#fff" }}
+    <div
+      ref={containerRef}
       onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      style={{
+        position: "relative",
+        width: 800,
+        height: 600,
+        border: "2px solid #ccc",
+        backgroundColor: "#fff",
+        userSelect: "none",
+      }}
     />
   );
 });
