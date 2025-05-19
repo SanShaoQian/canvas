@@ -12,7 +12,7 @@ const CanvasBrushTool: React.FC = observer(() => {
     canvas.style.position = "absolute";
     canvas.style.top = "0";
     canvas.style.left = "0";
-    canvas.style.pointerEvents = "none"; // avoid blocking mouse events
+    canvas.style.pointerEvents = "none"; 
     canvas.style.zIndex = (toolStore.layers.length + 1).toString();
     toolStore.addLayer(canvas);
     containerRef.current?.appendChild(canvas);
