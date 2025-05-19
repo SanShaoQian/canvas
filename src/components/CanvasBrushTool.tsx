@@ -34,7 +34,7 @@ const CanvasBrushTool: React.FC = observer(() => {
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.lineWidth = 5;
+    ctx.lineWidth = toolStore.brushSize;
     ctx.strokeStyle = toolStore.selectedColor;
     ctx.fillStyle = toolStore.selectedColor;
 

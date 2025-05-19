@@ -3,6 +3,7 @@ import { makeObservable, observable, action } from "mobx";
 class ToolStore {
   selectedTool: "brush" | "fill" | "shape" = "brush";
   selectedColor: string = "#000000";
+  brushSize: 5 | 10 | 15 = 5;
   shape: "circle" | "rectangle" | "triangle" = "circle";
   layers: HTMLCanvasElement[] = [];
 
@@ -10,10 +11,12 @@ class ToolStore {
     makeObservable(this, {
       selectedTool: observable,
       selectedColor: observable,
+      brushSize: observable,
       shape: observable,
       layers: observable,
       setTool: action,
       setColor: action,
+      setBrushSize: action,
       setShape: action,
       addLayer: action,
       removeLayer:action
@@ -26,6 +29,10 @@ class ToolStore {
 
   setColor(color: string) {
     this.selectedColor = color;
+  }
+
+  setBrushSize(size: 5 | 10 | 15) {
+    this.brushSize = size;
   }
 
   setShape(shape: "circle" | "rectangle" | "triangle") {

@@ -66,6 +66,22 @@ const ControlPanel: React.FC = observer(() => {
             </select>
           </label>
         )}
+
+        {toolStore.selectedTool === "brush" && (
+          <label>
+            Size: {" "}
+            <select
+              value={toolStore.brushSize}
+              onChange={(e) =>
+                toolStore.setBrushSize(Number(e.target.value) as 5 | 10 | 15)
+              }
+            >
+                <option value={5}>Thin</option>
+                <option value={10}>Regular</option>
+                <option value={15}>Thick</option>
+            </select>
+          </label>
+        )}
       </div>
 
       <div style={{ display: "flex", gap: "1rem" }}>
