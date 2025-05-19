@@ -1,11 +1,13 @@
 import { makeObservable, observable, action } from "mobx";
 
+type LayerTuple = [String, HTMLCanvasElement]
+
 class ToolStore {
   selectedTool: "brush" | "fill" | "shape" = "brush";
   selectedColor: string = "#000000";
   brushSize: 5 | 10 | 15 = 5;
   shape: "circle" | "rectangle" | "triangle" = "circle";
-  layers: HTMLCanvasElement[] = [];
+  layers: LayerTuple[] = [];
 
   constructor() {
     makeObservable(this, {
@@ -39,12 +41,12 @@ class ToolStore {
     this.shape = shape;
   }
 
-  addLayer(canvas: HTMLCanvasElement) {
-    this.layers.push(canvas);
+  addLayer(name: String, canvas: HTMLCanvasElement) {
+    this.layers.push([name, canvas]);
   }
 
   removeLayer(index: number) {
-    const layer = this.layers[index];
+    const layer = this.layers[index][1];
     if (layer && layer.parentElement) {
       layer.parentElement.removeChild(layer);
     }
@@ -53,12 +55,25 @@ class ToolStore {
 
   clearLayers() {
     this.layers.forEach(layer => {
-      if (layer.parentElement) {
-        layer.parentElement.removeChild(layer);
+      if (layer[1].parentElement) {
+        layer[1].parentElement.removeChild(layer[1]);
       }
     });
     this.layers = [];
   }
+
+    toString(): string {
+    let str = `Tool: ${toolStore.selectedTool}, \n`;
+    if (toolStore.selectedTool === "brush") {
+      const sizeLabel = toolStore.brushSize === 5 ? "thin" : toolStore.brushSize === 10 ? "regular" : "thick";
+      str += `Size: ${sizeLabel}, \n`;
+    }
+    if (toolStore.selectedTool === "shape") {
+      str += `Shape: ${toolStore.shape}, \n`;
+    }
+    str += `Color: ${toolStore.selectedColor} \n`;
+    return str;
+  };
 }
 
 const toolStore = new ToolStore();

@@ -14,7 +14,7 @@ const CanvasBrushTool: React.FC = observer(() => {
     canvas.style.left = "0";
     canvas.style.pointerEvents = "none"; 
     canvas.style.zIndex = (toolStore.layers.length + 1).toString();
-    toolStore.addLayer(canvas);
+    toolStore.addLayer(toolStore.toString(), canvas);
     containerRef.current?.appendChild(canvas);
     return canvas;
   };
