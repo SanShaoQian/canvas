@@ -26,4 +26,5 @@ class ToolStore {
 }
 
 const toolStore = new ToolStore();
+
 export default toolStore;
